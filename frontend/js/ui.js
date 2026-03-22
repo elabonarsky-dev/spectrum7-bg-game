@@ -100,9 +100,9 @@ const UI = (() => {
    * Returns a Promise that resolves when the last reel has stopped.
    *
    * Strip layout (per reel i):
-   *   indices 0 – 20      : SPIN_TILES shuffled prefix tiles
-   *   indices 21 – 27     : the 7 result colours in order
-   *   indices 28 – 30     : 3 trailing buffer tiles
+   *   indices  0 – 27     : SPIN_TILES shuffled prefix tiles  (4 × ROYGBIV)
+   *   indices 28 – 34     : the 7 result colours in order
+   *   indices 35 – 37     : 3 trailing buffer tiles
    *
    * Target tile for reel i = index (SPIN_TILES + i).
    * Centre-window translateY = -((SPIN_TILES + i - 1) * tileH)
@@ -130,9 +130,12 @@ const UI = (() => {
         strip.style.transform  = 'translateY(0)';
         strip.innerHTML        = '';
 
-        // ── 2. Prefix: three randomised ROYGBIV cycles ────────────────────
+        // ── 2. Prefix: exactly SPIN_TILES tiles ──────────────────────────
+        // Derive cycle count from SPIN_TILES so this never goes out of sync.
+        // SPIN_TILES=28 → 4 cycles = 28 tiles.  SPIN_TILES=21 → 3 cycles = 21.
         const prefix = [];
-        for (let r = 0; r < 3; r++) prefix.push(...COLOURS);
+        const spinCycles = Math.ceil(SPIN_TILES / COLOURS.length);
+        for (let r = 0; r < spinCycles; r++) prefix.push(...COLOURS);
         for (let k = prefix.length - 1; k > 0; k--) {
           const j = Math.floor(Math.random() * (k + 1));
           [prefix[k], prefix[j]] = [prefix[j], prefix[k]];
