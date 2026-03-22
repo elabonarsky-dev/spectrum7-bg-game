@@ -134,20 +134,24 @@ const UI = (() => {
         //
         // Rules enforced tile-by-tile:
         //   • Each tile ≠ the tile immediately before it (no same-colour run).
-        //   • The LAST prefix tile also ≠ result[0], because that tile sits
-        //     directly above result[0] in reel 0's visible window at rest.
-        //     Without this, reel 0 would show the same colour in its top and
-        //     centre slots after the spin stops.
+        //   • The LAST prefix tile must differ from BOTH result[0] AND result[1].
+        //     At rest, reel 0's window shows: prefix[last] | result[0] | result[1].
+        //     Excluding only result[0] allowed prefix[last] === result[1], so the
+        //     top and bottom slots could show the same colour (e.g. YELLOW–GREEN–YELLOW).
         //
-        // With 7 colours available, excluding at most 2 always leaves ≥ 5
-        // choices, so this never deadlocks.
+        // With 7 colours, the last pick excludes at most 3 (prev, result[0], result[1])
+        // → ≥ 4 choices remain.
         const prefix = [];
         let prevPrefixColour = null;
 
         for (let p = 0; p < SPIN_TILES; p++) {
           const isLastTile = (p === SPIN_TILES - 1);
           let available = COLOURS.filter(c => c !== prevPrefixColour);
-          if (isLastTile) available = available.filter(c => c !== result[0]);
+          if (isLastTile) {
+            available = available.filter(
+              c => c !== result[0] && c !== result[1]
+            );
+          }
           const pick = available[Math.floor(Math.random() * available.length)];
           prefix.push(pick);
           prevPrefixColour = pick;
