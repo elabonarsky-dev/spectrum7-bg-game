@@ -5,6 +5,10 @@
  */
 :root {
   --tile-h: 72px;
+  --chrome-dark: #1a1c22;
+  --chrome-mid: #3a3d48;
+  --chrome-light: #6d7280;
+  --bezel-shadow: rgba(0, 0, 0, 0.55);
 }
 
 /* ===== Base Reset & Typography ===== */
@@ -29,17 +33,93 @@ body {
 
 #game-container {
   width: 100%;
-  max-width: 720px;
+  max-width: 760px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
-/* ===== Header ===== */
+/* ===== Slot machine — reels as hero (top of page) ===== */
+
+.machine-section {
+  width: 100%;
+}
+
+.machine-bezel {
+  position: relative;
+  padding: 0.5rem;
+  border-radius: 14px;
+  background:
+    linear-gradient(165deg,
+      #5c616e 0%,
+      #2e3138 22%,
+      #1e2026 50%,
+      #353842 78%,
+      #4a4e5c 100%);
+  box-shadow:
+    0 4px 0 #0d0e12,
+    0 8px 24px var(--bezel-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.45);
+}
+
+/* Decorative “rivet” corners */
+.machine-bezel::before,
+.machine-bezel::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #9aa0b0, #2a2d35);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.8);
+  z-index: 2;
+  pointer-events: none;
+}
+.machine-bezel::before { top: 10px; left: 10px; }
+.machine-bezel::after  { top: 10px; right: 10px; }
+
+.machine-bezel__chrome {
+  text-align: center;
+  padding: 0.65rem 0.5rem 0.85rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.machine-bezel__brand {
+  display: block;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  color: #e8eaef;
+}
+
+.machine-bezel__tag {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(200, 205, 220, 0.65);
+}
+
+.machine-bezel__window {
+  margin: 0.35rem 0.4rem 0.55rem;
+  padding: 0.65rem 0.5rem 0.85rem;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, #0b0c10 0%, #12141a 40%, #0e0f14 100%);
+  box-shadow:
+    inset 0 3px 12px rgba(0, 0, 0, 0.85),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* ===== Header (secondary, below reels) ===== */
 
 #game-header {
   text-align: center;
-  padding: 1.25rem 0 0.5rem;
+  padding: 0.35rem 0 0.25rem;
 }
 
 #game-header h1 {
@@ -177,44 +257,62 @@ section h2 {
 #reels-container {
   position: relative;
   display: flex;
-  gap: 0.4rem;
+  gap: 0.45rem;
   justify-content: center;
+  min-height: calc(var(--tile-h) * 3);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 }
 
-/* Top win-line border */
+/* Win line — gold inset highlights (fruit-machine style) */
 #reels-container::before {
   content: '';
   position: absolute;
   left: 0; right: 0;
   top: var(--tile-h);
   height: 2px;
-  background: rgba(255, 255, 255, 0.45);
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 214, 120, 0.95) 15%,
+    rgba(255, 248, 220, 1) 50%,
+    rgba(255, 214, 120, 0.95) 85%,
+    transparent 100%);
+  box-shadow: 0 0 8px rgba(255, 220, 140, 0.35);
   pointer-events: none;
   z-index: 10;
 }
 
-/* Bottom win-line border */
 #reels-container::after {
   content: '';
   position: absolute;
   left: 0; right: 0;
   top: calc(var(--tile-h) * 2);
   height: 2px;
-  background: rgba(255, 255, 255, 0.45);
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 214, 120, 0.95) 15%,
+    rgba(255, 248, 220, 1) 50%,
+    rgba(255, 214, 120, 0.95) 85%,
+    transparent 100%);
+  box-shadow: 0 0 8px rgba(255, 220, 140, 0.35);
   pointer-events: none;
   z-index: 10;
 }
 
-/* Individual reel window */
+/* Individual reel window — chrome frame */
 .reel-window {
   width: var(--tile-h);
   height: calc(var(--tile-h) * 3);
-  border: 2px solid #3a3a4a;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
   position: relative;
-  background: #0a0a12;
   flex-shrink: 0;
+  background: linear-gradient(180deg, #15171a 0%, #0a0a0e 100%);
+  border: 2px solid #2a2d35;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.45),
+    0 2px 4px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 /* Top fade — fades out tiles scrolling in from above */
@@ -252,8 +350,11 @@ section h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   user-select: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
 /* Colour name label inside each tile */

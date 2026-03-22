@@ -1,33 +1,49 @@
 /**
  * ui.js — DOM rendering helpers for Spectrum 7.
  *
- * Pure rendering functions that read GameState and update the DOM.
- * No game logic lives here.
- *
  * Reel animation model
  * ────────────────────
  * Each reel is a windowed container (overflow: hidden) 3 tiles tall.
  * The middle tile is the win line.
  *
- * On spin, a long strip is built per reel:
- *   [ SPIN_TILES random tiles ] [ 7 result tiles ] [ 3 trailing tiles ]
+ * Spin direction: the strip starts translated UP (more negative) and animates
+ * toward the landing position (less negative). Visually, symbols move DOWN —
+ * like a physical drum rotating forward.
  *
- * The strip starts at translateY(0) and transitions to a calculated
- * final position where result[i] sits in the centre window slot.
+ * Strip layout per reel:
+ *   [ PRE_SPIN padding ] [ SPIN_TILES prefix ] [ 7 result ] [ 3 trailing ] [ POST padding ]
  *
- * Staggered stopping: each reel has a progressively longer transition
- * duration so they stop left-to-right naturally.
+ * Staggered stopping: each reel has a longer total duration so they lock
+ * left → right with a heavy ease-out (momentum feel).
  */
 
 const UI = (() => {
 
-  // ─── Constants ─────────────────────────────────────────────────────────────
-
-  // Number of "spinning" tiles before the result region.
-  // 28 = 4 complete ROYGBIV cycles — enough depth for the longer ~5 s spin.
   const SPIN_TILES = 28;
 
-  // ─── DOM helpers ───────────────────────────────────────────────────────────
+  /** Extra tiles before the prefix — allows starting the animation further “up” the strip. */
+  const PRE_SPIN_TILES = 22;
+
+  /** Extra tiles after trailing buffer — headroom so translateY never runs off the strip. */
+  const POST_SPIN_TILES = 24;
+
+  /**
+   * How many tile-heights of travel before the landing position.
+   * Larger = longer visible blur, stronger sense of downward travel.
+   */
+  const SPIN_EXTRA_TILES = 18;
+
+  /** Base spin duration (ms); last reel adds STAGGER_MS * 6. */
+  const SPIN_BASE_MS = 5200;
+
+  /** Extra ms per reel index — reel 0 stops first, reel 6 last. */
+  const STAGGER_MS = 520;
+
+  /**
+   * Main spin easing: slow build (weight), long heavy deceleration at the end.
+   * Values approximate a physical drum losing energy.
+   */
+  const SPIN_EASING = 'cubic-bezier(0.08, 0.82, 0.12, 1)';
 
   const $palette       = () => document.getElementById('colour-palette');
   const $sequence      = () => document.getElementById('selected-sequence');
@@ -38,17 +54,11 @@ const UI = (() => {
   const $resultArea    = () => document.getElementById('result-area');
   const $resultMsg     = () => document.getElementById('result-message');
 
-  /**
-   * Reads --tile-h from the CSS root so JS and CSS always agree on tile size.
-   * Falls back to 72 if the variable is missing.
-   */
   function getTileH() {
     const raw = getComputedStyle(document.documentElement)
       .getPropertyValue('--tile-h').trim();
     return parseInt(raw) || 72;
   }
-
-  // ─── Reel tile factories ────────────────────────────────────────────────────
 
   function createReelTile(colour) {
     const tile = document.createElement('div');
@@ -64,12 +74,24 @@ const UI = (() => {
     return tile;
   }
 
-  // ─── Build / reset reel DOM (called on init and on reset) ──────────────────
-
   /**
-   * Constructs 7 reel windows, each showing three colour tiles in the initial
-   * ROYGBIV order. The centre tile of each reel is COLOURS[i].
+   * Random tiles with no adjacent duplicate colours.
+   * @param {number} count
+   * @param {string|null} notFirst - optional colour forbidden at index 0
    */
+  function buildRandomRun(count, notFirst = null) {
+    const out = [];
+    let prev = null;
+    for (let p = 0; p < count; p++) {
+      let avail = COLOURS.filter(c => c !== prev);
+      if (p === 0 && notFirst) avail = avail.filter(c => c !== notFirst);
+      const pick = avail[Math.floor(Math.random() * avail.length)];
+      out.push(pick);
+      prev = pick;
+    }
+    return out;
+  }
+
   function buildReels() {
     const container = $reelContainer();
     container.innerHTML = '';
@@ -82,7 +104,6 @@ const UI = (() => {
       const strip = document.createElement('div');
       strip.className = 'reel-strip';
 
-      // Three tiles: colour above, this reel's colour (centre), colour below
       const prev = COLOURS[(i + 6) % 7];
       const curr = COLOURS[i];
       const next = COLOURS[(i + 1) % 7];
@@ -93,57 +114,55 @@ const UI = (() => {
     }
   }
 
-  // ─── Spin animation ─────────────────────────────────────────────────────────
+  /**
+   * Brief mechanical “lock” after the main ease: tiny overshoot then settle.
+   */
+  function applyMechanicalSettle(strip, finalY, tileH) {
+    const overshoot = Math.max(4, Math.min(8, tileH * 0.1));
+
+    strip.style.transition = 'none';
+    strip.style.transform = `translateY(${finalY}px)`;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        strip.style.transition = 'transform 0.09s cubic-bezier(0.45, 0, 0.55, 1)';
+        strip.style.transform = `translateY(${finalY + overshoot}px)`;
+
+        const onNudgeEnd = () => {
+          strip.removeEventListener('transitionend', onNudgeEnd);
+          strip.style.transition = 'transform 0.22s cubic-bezier(0.22, 1.15, 0.35, 1)';
+          strip.style.transform = `translateY(${finalY}px)`;
+        };
+        strip.addEventListener('transitionend', onNudgeEnd, { once: true });
+      });
+    });
+  }
 
   /**
-   * Animates all 7 reels downward with staggered stopping (left → right).
-   * Returns a Promise that resolves when the last reel has stopped.
-   *
-   * Strip layout (per reel i):
-   *   indices  0 – 27     : SPIN_TILES shuffled prefix tiles  (4 × ROYGBIV)
-   *   indices 28 – 34     : the 7 result colours in order
-   *   indices 35 – 37     : 3 trailing buffer tiles
-   *
-   * Target tile for reel i = index (SPIN_TILES + i).
-   * Centre-window translateY = -((SPIN_TILES + i - 1) * tileH)
-   *
-   * Transition durations (ms):
-   *   reel 0 → 1 400   reel 1 → 1 780   ...   reel 6 → 3 660
+   * Downward spin: start at startY (more negative), end at finalY (less negative).
+   * Symbols scroll visually downward.
    */
   function spinReels(result) {
-    const totalReels  = 7;
-    const maxDuration = 3000 + (totalReels - 1) * 320 + 700; // safety margin
+    const totalReels = 7;
+    const maxDuration =
+      SPIN_BASE_MS + (totalReels - 1) * STAGGER_MS + 900;
 
     return new Promise(resolve => {
-      const tileH   = getTileH();
+      const tileH = getTileH();
       const windows = document.querySelectorAll('.reel-window');
       let stoppedCount = 0;
 
-      // Fallback resolver in case transitionend does not fire
       const fallback = setTimeout(resolve, maxDuration);
 
       windows.forEach((win, i) => {
         const strip = win.querySelector('.reel-strip');
 
-        // ── 1. Instantly reset strip position (no animation) ──────────────
         strip.style.transition = 'none';
-        strip.style.transform  = 'translateY(0)';
-        strip.innerHTML        = '';
+        strip.style.transform = 'translateY(0)';
+        strip.innerHTML = '';
 
-        // ── 2. Prefix: SPIN_TILES tiles with no adjacent duplicate colours ──
-        //
-        // Rules enforced tile-by-tile:
-        //   • Each tile ≠ the tile immediately before it (no same-colour run).
-        //   • The LAST prefix tile must differ from BOTH result[0] AND result[1].
-        //     At rest, reel 0's window shows: prefix[last] | result[0] | result[1].
-        //     Excluding only result[0] allowed prefix[last] === result[1], so the
-        //     top and bottom slots could show the same colour (e.g. YELLOW–GREEN–YELLOW).
-        //
-        // With 7 colours, the last pick excludes at most 3 (prev, result[0], result[1])
-        // → ≥ 4 choices remain.
         const prefix = [];
         let prevPrefixColour = null;
-
         for (let p = 0; p < SPIN_TILES; p++) {
           const isLastTile = (p === SPIN_TILES - 1);
           let available = COLOURS.filter(c => c !== prevPrefixColour);
@@ -157,34 +176,55 @@ const UI = (() => {
           prevPrefixColour = pick;
         }
 
-        prefix.forEach(c => strip.appendChild(createReelTile(c)));
+        const preSpin = buildRandomRun(PRE_SPIN_TILES);
+        if (preSpin[PRE_SPIN_TILES - 1] === prefix[0]) {
+          const prev = PRE_SPIN_TILES > 1 ? preSpin[PRE_SPIN_TILES - 2] : null;
+          let fix = COLOURS.filter(
+            c => c !== prefix[0] && c !== prev
+          );
+          preSpin[PRE_SPIN_TILES - 1] =
+            fix[Math.floor(Math.random() * fix.length)];
+        }
 
-        // ── 3. Result tiles (all 7) ───────────────────────────────────────
+        preSpin.forEach(c => strip.appendChild(createReelTile(c)));
+        prefix.forEach(c => strip.appendChild(createReelTile(c)));
         result.forEach(c => strip.appendChild(createReelTile(c)));
 
-        // ── 4. Trailing buffer (prevents the strip ending too soon) ───────
         for (let t = 0; t < 3; t++) {
           strip.appendChild(createReelTile(result[(i + t + 1) % 7]));
         }
 
-        // ── 5. Calculate final translateY so result[i] lands at centre ────
-        const targetIndex = SPIN_TILES + i;                   // 0-based
-        const finalY      = -((targetIndex - 1) * tileH);    // px
+        const lastTrail = result[(i + 3) % 7];
+        const postSpin = buildRandomRun(POST_SPIN_TILES, lastTrail);
+        postSpin.forEach(c => strip.appendChild(createReelTile(c)));
 
-        // ── 6. Apply staggered transition (double rAF for reliable reflow) ─
-        // Reel 0 → 3 000 ms, Reel 6 → 4 920 ms ≈ 5 s total
-        const duration = 3000 + i * 320;
+        const centerIndex = PRE_SPIN_TILES + SPIN_TILES + i;
+        const finalY = -((centerIndex - 1) * tileH);
+        const startY = finalY - SPIN_EXTRA_TILES * tileH;
+
+        const duration = SPIN_BASE_MS + i * STAGGER_MS;
+
+        strip.style.willChange = 'transform';
+        strip.style.transform = `translateY(${startY}px)`;
 
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            // cubic-bezier: very fast start, smooth deceleration to stop
-            strip.style.transition = `transform ${duration}ms cubic-bezier(0.15, 0.9, 0.4, 1.0)`;
-            strip.style.transform  = `translateY(${finalY}px)`;
+            strip.style.transition =
+              `transform ${duration}ms ${SPIN_EASING}`;
+            strip.style.transform = `translateY(${finalY}px)`;
           });
         });
 
-        // ── 7. Resolve promise once all reels have stopped ────────────────
-        strip.addEventListener('transitionend', () => {
+        strip.addEventListener('transitionend', function onMainEnd(e) {
+          if (e.propertyName !== 'transform') return;
+          strip.removeEventListener('transitionend', onMainEnd);
+          strip.style.willChange = 'auto';
+
+          if (typeof ReelAudio !== 'undefined') {
+            ReelAudio.playReelStop();
+          }
+          applyMechanicalSettle(strip, finalY, tileH);
+
           stoppedCount++;
           if (stoppedCount >= totalReels) {
             clearTimeout(fallback);
@@ -194,8 +234,6 @@ const UI = (() => {
       });
     });
   }
-
-  // ─── Palette ────────────────────────────────────────────────────────────────
 
   function buildPalette(onSelect) {
     const container = $palette();
@@ -211,8 +249,6 @@ const UI = (() => {
       container.appendChild(btn);
     });
   }
-
-  // ─── Sequence ───────────────────────────────────────────────────────────────
 
   function renderSequence() {
     const container = $sequence();
@@ -232,8 +268,6 @@ const UI = (() => {
       container.appendChild(chip);
     });
   }
-
-  // ─── Result ─────────────────────────────────────────────────────────────────
 
   function renderResult() {
     const area = $resultArea();
@@ -255,8 +289,6 @@ const UI = (() => {
     }
   }
 
-  // ─── Controls ───────────────────────────────────────────────────────────────
-
   function updateControls() {
     const hasSelection = GameState.hasSelection();
     const atMax        = GameState.selectedColours.length >= 7;
@@ -265,18 +297,11 @@ const UI = (() => {
     $btnUndo().disabled  = !hasSelection || GameState.spinning;
     $btnReset().disabled = !hasSelection || GameState.spinning;
 
-    // Each colour button is disabled if:
-    //   • a spin is in progress, OR
-    //   • the full 7 colours are already chosen, OR
-    //   • this specific colour has already been selected
     $palette().querySelectorAll('.colour-btn').forEach(btn => {
       const alreadyPicked = GameState.isColourSelected(btn.dataset.colour);
       btn.disabled = GameState.spinning || atMax || alreadyPicked;
     });
   }
-
-  // ─── Refresh all ────────────────────────────────────────────────────────────
-  // Reel rendering is handled exclusively by buildReels() and spinReels().
 
   function refreshAll() {
     renderSequence();

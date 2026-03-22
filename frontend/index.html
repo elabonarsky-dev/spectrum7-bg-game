@@ -10,9 +10,23 @@
 <body>
   <div id="game-container">
 
+    <!-- Reels first: primary focus of the game -->
+    <section id="reels-area" class="machine-section" aria-label="Slot reels">
+      <div class="machine-bezel">
+        <div class="machine-bezel__chrome">
+          <span class="machine-bezel__brand">SPECTRUM 7</span>
+          <span class="machine-bezel__tag">7 colours · 1 line</span>
+        </div>
+        <div class="machine-bezel__window">
+          <!-- Win line: #reels-container ::before / ::after -->
+          <div id="reels-container"></div>
+        </div>
+      </div>
+    </section>
+
     <header id="game-header">
       <h1>Spectrum <span class="accent">7</span></h1>
-      <p class="subtitle">Pick your colours. Match the reels.</p>
+      <p class="subtitle">Pick your colours. Match the line.</p>
     </header>
 
     <section id="selection-area">
@@ -29,13 +43,6 @@
       <div id="selected-sequence"></div>
     </section>
 
-    <section id="reels-area">
-      <h2>Reels</h2>
-      <!-- Reel windows are built dynamically by UI.buildReels() -->
-      <!-- Win line is rendered via #reels-container::before / ::after in CSS -->
-      <div id="reels-container"></div>
-    </section>
-
     <section id="action-area">
       <button id="btn-spin" disabled>Spin</button>
     </section>
@@ -48,6 +55,7 @@
 
   <script src="js/state.js"></script>
   <script src="js/reels.js"></script>
+  <script src="js/audio.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/selection.js"></script>
   <script src="js/app.js"></script>

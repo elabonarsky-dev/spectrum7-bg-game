@@ -25,13 +25,14 @@ spectrum7/
       mobile.css         Responsive overrides
     js/
       app.js             Entry point — wires events, mock spin flow
+      audio.js           Web Audio spin rumble + reel-stop thunks
       state.js           Central game state
       selection.js       Colour selection / undo / reset handlers
-      reels.js           Validation logic + temporary mock spin
-      ui.js              DOM rendering helpers
+      reels.js           Validation logic + shuffle (no duplicate colours)
+      ui.js              Reel DOM, chrome layout, spin animation
     storeroom/
       images/            (future assets)
-      audio/             (future assets)
+      audio/             (optional; game uses Web Audio by default)
   README.md
 ```
 
@@ -73,15 +74,16 @@ GET http://localhost:3000/api/health
 | Undo last / reset selection | Done |
 | 7-reel placeholder layout | Done |
 | Left-to-right validation logic | Done |
-| Mock spin with local random result | Done |
+| Mock spin with local shuffle (full ROYGBIV permutation) | Done |
+| Downward reel motion, staggered stop, mechanical settle | Done |
+| Basic Web Audio (spin rumble + per-reel lock sounds) | Done |
 | Win / loss outcome display | Done |
 | Backend Express scaffold + health route | Done |
 | Mobile-responsive layout | Done |
 | Server-side RNG | Milestone 2 |
-| Reel animation | Milestone 2 |
 | Credits / balance system | Milestone 2+ |
 | Stripe integration | Future |
-| Audio | Future |
+| Polished sampled audio assets | Optional / later |
 
 ---
 

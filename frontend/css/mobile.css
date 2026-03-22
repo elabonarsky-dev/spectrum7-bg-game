@@ -11,6 +11,16 @@
     --tile-h: 52px;
   }
 
+  .machine-bezel__brand {
+    font-size: 1.05rem;
+    letter-spacing: 0.18em;
+  }
+
+  .machine-bezel__window {
+    margin: 0.25rem 0.2rem 0.45rem;
+    padding: 0.45rem 0.35rem 0.55rem;
+  }
+
   #game-header h1 {
     font-size: 1.9rem;
   }
