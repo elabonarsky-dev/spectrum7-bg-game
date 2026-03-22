@@ -4,13 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Spectrum 7</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo+Black&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="css/mobile.css" />
 </head>
 <body>
   <div id="game-container">
 
-    <!-- Reels first: primary focus of the game -->
+    <!-- Upper glass / reel housing -->
     <section id="reels-area" class="machine-section" aria-label="Slot reels">
       <div class="machine-bezel">
         <div class="machine-bezel__chrome">
@@ -18,38 +21,45 @@
           <span class="machine-bezel__tag">7 colours · 1 line</span>
         </div>
         <div class="machine-bezel__window">
-          <!-- Win line: #reels-container ::before / ::after -->
           <div id="reels-container"></div>
         </div>
       </div>
     </section>
 
-    <header id="game-header">
-      <h1>Spectrum <span class="accent">7</span></h1>
-      <p class="subtitle">Pick your colours. Match the line.</p>
-    </header>
+    <!-- Lower cabinet: clunky chrome + plastic control deck -->
+    <div class="cabinet-front">
+      <div class="cabinet-front__hinge" aria-hidden="true"></div>
 
-    <section id="selection-area">
-      <h2>Choose Your Colours</h2>
-      <div id="colour-palette"></div>
-      <div id="selection-controls">
-        <button id="btn-undo" disabled>Undo Last</button>
-        <button id="btn-reset" disabled>Reset</button>
-      </div>
-    </section>
+      <header id="game-header">
+        <h1>Spectrum <span class="accent">7</span></h1>
+        <p class="subtitle">Pick your colours. Match the line.</p>
+      </header>
 
-    <section id="sequence-area">
-      <h2>Your Sequence</h2>
-      <div id="selected-sequence"></div>
-    </section>
+      <section id="selection-area">
+        <h2 class="panel-label">Choose your colours</h2>
+        <div id="colour-palette"></div>
+        <div id="selection-controls" class="button-row">
+          <button type="button" id="btn-undo" class="btn-chrome" disabled>Undo last</button>
+          <button type="button" id="btn-reset" class="btn-chrome" disabled>Reset</button>
+        </div>
+      </section>
 
-    <section id="action-area">
-      <button id="btn-spin" disabled>Spin</button>
-    </section>
+      <section id="sequence-area">
+        <h2 class="panel-label">Your sequence</h2>
+        <div id="selected-sequence" class="sequence-plate"></div>
+      </section>
 
-    <section id="result-area" class="hidden">
-      <div id="result-message"></div>
-    </section>
+      <section id="action-area">
+        <button type="button" id="btn-spin" class="btn-spin-mushroom" disabled>
+          <span class="btn-spin-mushroom__ring" aria-hidden="true"></span>
+          <span class="btn-spin-mushroom__label">SPIN</span>
+        </button>
+      </section>
+
+      <section id="result-area" class="hidden">
+        <div id="result-message"></div>
+      </section>
+    </div>
 
   </div>
 

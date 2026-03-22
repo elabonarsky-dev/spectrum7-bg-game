@@ -9,6 +9,13 @@
   --chrome-mid: #3a3d48;
   --chrome-light: #6d7280;
   --bezel-shadow: rgba(0, 0, 0, 0.55);
+  /* Pub fruit-machine palette */
+  --cabinet-plastic: #3d1218;
+  --cabinet-plastic-deep: #1e080c;
+  --cabinet-plastic-light: #5a1e28;
+  --brass: #c9a227;
+  --brass-dark: #6b5218;
+  --metal-face: #4a4e58;
 }
 
 /* ===== Base Reset & Typography ===== */
@@ -20,23 +27,35 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #121218;
+  font-family: 'Oswald', 'Segoe UI', sans-serif;
+  /* Worn pub carpet / felt */
+  background-color: #0f1a12;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% 20%, rgba(40, 70, 45, 0.35) 0%, transparent 55%),
+    repeating-linear-gradient(
+      -12deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.06) 3px,
+      rgba(0, 0, 0, 0.06) 4px
+    ),
+    linear-gradient(180deg, #0a120d 0%, #152018 50%, #0a0f0c 100%);
   color: #e8e8e8;
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  padding: 1rem;
+  padding: 1rem 0.75rem 2rem;
 }
 
 /* ===== Game Container ===== */
 
 #game-container {
   width: 100%;
-  max-width: 760px;
+  max-width: 780px;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.65));
 }
 
 /* ===== Slot machine — reels as hero (top of page) ===== */
@@ -48,84 +67,164 @@ body {
 .machine-bezel {
   position: relative;
   padding: 0.5rem;
-  border-radius: 14px;
+  border-radius: 14px 14px 0 0;
   background:
     linear-gradient(165deg,
-      #5c616e 0%,
-      #2e3138 22%,
-      #1e2026 50%,
-      #353842 78%,
-      #4a4e5c 100%);
+      #7a808e 0%,
+      #4a4e58 18%,
+      #2e3138 45%,
+      #3a3e4a 72%,
+      #5c616e 100%);
+  border: 3px solid #8e949e;
+  border-bottom: none;
   box-shadow:
-    0 4px 0 #0d0e12,
-    0 8px 24px var(--bezel-shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -2px 6px rgba(0, 0, 0, 0.45);
+    0 3px 0 #1a1c20,
+    inset 0 2px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.35);
 }
 
-/* Decorative “rivet” corners */
+/* Corner bolts — top glass housing */
 .machine-bezel::before,
 .machine-bezel::after {
   content: '';
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #9aa0b0, #2a2d35);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.8);
+  background: radial-gradient(circle at 35% 35%, #d4d8e0, #4a4e5a 55%, #1a1c22);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.45),
+    0 2px 3px rgba(0, 0, 0, 0.9);
   z-index: 2;
   pointer-events: none;
 }
-.machine-bezel::before { top: 10px; left: 10px; }
-.machine-bezel::after  { top: 10px; right: 10px; }
+.machine-bezel::before { top: 12px; left: 12px; }
+.machine-bezel::after  { top: 12px; right: 12px; }
 
 .machine-bezel__chrome {
   text-align: center;
-  padding: 0.65rem 0.5rem 0.85rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+  padding: 0.75rem 0.5rem 0.9rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.85);
 }
 
 .machine-bezel__brand {
   display: block;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: 0.28em;
-  color: #e8eaef;
+  font-family: 'Archivo Black', 'Oswald', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  color: #f0f2f8;
+  text-transform: uppercase;
 }
 
 .machine-bezel__tag {
   display: block;
   margin-top: 0.2rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(200, 205, 220, 0.65);
+  color: rgba(220, 225, 235, 0.55);
 }
 
 .machine-bezel__window {
-  margin: 0.35rem 0.4rem 0.55rem;
-  padding: 0.65rem 0.5rem 0.85rem;
-  border-radius: 10px;
+  margin: 0.4rem 0.45rem 0.35rem;
+  padding: 0.75rem 0.55rem 0.9rem;
+  border-radius: 8px;
   background:
-    linear-gradient(180deg, #0b0c10 0%, #12141a 40%, #0e0f14 100%);
+    linear-gradient(180deg, #050608 0%, #141820 50%, #0a0c10 100%);
   box-shadow:
-    inset 0 3px 12px rgba(0, 0, 0, 0.85),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    inset 0 4px 16px rgba(0, 0, 0, 0.95),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 2px solid #1e2228;
+}
+
+/* ===== Lower cabinet: plastic front + metal deck ===== */
+
+.cabinet-front {
+  position: relative;
+  padding: 1rem 1.1rem 1.5rem;
+  border-radius: 0 0 16px 16px;
+  background:
+    linear-gradient(180deg, var(--cabinet-plastic-light) 0%, var(--cabinet-plastic) 22%, var(--cabinet-plastic-deep) 100%);
+  border: 3px solid #8e949e;
+  border-top: 2px solid #2a2d35;
+  box-shadow:
+    0 6px 0 #0a0808,
+    0 10px 28px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Brass strip between reels and deck */
+.cabinet-front__hinge {
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 5px;
+  margin-top: -1px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #e8d080 0%, var(--brass) 40%, var(--brass-dark) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+/* Corner bolts on cabinet */
+.cabinet-front::before,
+.cabinet-front::after {
+  content: '';
+  position: absolute;
+  bottom: 14px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e0e4ec, #5a5e68 50%, #2a2c32);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.85);
+  z-index: 2;
+  pointer-events: none;
+}
+.cabinet-front::before { left: 14px; }
+.cabinet-front::after  { right: 14px; }
+
+#selection-area {
+  margin-bottom: 1rem;
+}
+
+#sequence-area {
+  margin-bottom: 0.35rem;
+}
+
+.empty-hint {
+  color: rgba(180, 175, 170, 0.55);
+  font-style: italic;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
 }
 
 /* ===== Header (secondary, below reels) ===== */
 
 #game-header {
   text-align: center;
-  padding: 0.35rem 0 0.25rem;
+  padding: 0.5rem 0 0.75rem;
 }
 
 #game-header h1 {
-  font-size: 2.4rem;
-  letter-spacing: 0.04em;
-  font-weight: 700;
+  font-family: 'Archivo Black', 'Oswald', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.12em;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: rgba(245, 230, 210, 0.9);
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.85);
 }
 
 #game-header .accent {
@@ -136,88 +235,167 @@ body {
 }
 
 .subtitle {
-  margin-top: 0.25rem;
-  font-size: 0.95rem;
-  color: #999;
+  margin-top: 0.35rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(200, 190, 185, 0.65);
 }
 
-/* ===== Section Headings ===== */
+/* ===== Panel labels (embossed metal strip) ===== */
 
-section h2 {
-  font-size: 1rem;
+.panel-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #888;
-  margin-bottom: 0.75rem;
+  color: rgba(30, 15, 18, 0.85);
+  margin-bottom: 0.65rem;
+  padding: 0.35rem 0.4rem;
+  text-align: center;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #6a6e78 0%, #4a4e5a 45%, #3a3d48 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-/* ===== Colour Palette ===== */
+/* ===== Colour Palette — chunky chrome inserts ===== */
 
 #colour-palette {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.55rem;
   justify-content: center;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.1) 100%);
+  box-shadow:
+    inset 0 3px 10px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .colour-btn {
-  width: 80px;
-  height: 44px;
-  border: 2px solid transparent;
-  border-radius: 8px;
+  position: relative;
+  width: 88px;
+  height: 48px;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.72rem;
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+  /* Chrome outer */
+  box-shadow:
+    0 0 0 1px #1a1a24,
+    0 0 0 3px #9a9ea8,
+    0 4px 0 #0d0d12,
+    0 5px 8px rgba(0, 0, 0, 0.55),
+    inset 0 2px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.45);
+  transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.15s ease;
 }
 
 .colour-btn:hover:not(:disabled) {
-  transform: scale(1.08);
-  box-shadow: 0 0 12px rgba(255,255,255,0.2);
+  filter: brightness(1.08);
+}
+
+.colour-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    0 0 0 1px #1a1a24,
+    0 0 0 3px #9a9ea8,
+    0 1px 0 #0d0d12,
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.45);
 }
 
 .colour-btn:disabled {
-  opacity: 0.35;
+  opacity: 0.38;
   cursor: not-allowed;
+  filter: grayscale(0.4) brightness(0.6);
 }
 
-/* ===== Selection Controls ===== */
+/* ===== Chrome bar buttons (Undo / Reset) ===== */
 
-#selection-controls {
+.button-row {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   justify-content: center;
-  margin-top: 0.75rem;
+  margin-top: 0.85rem;
+  flex-wrap: wrap;
 }
 
-#selection-controls button {
-  padding: 0.45rem 1.1rem;
-  border: 1px solid #555;
-  border-radius: 6px;
-  background: #1e1e28;
-  color: #ccc;
-  font-size: 0.85rem;
+.btn-chrome {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.55rem 1.25rem;
+  min-width: 118px;
+  min-height: 44px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  color: #e8e8e8;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #5a5e68 0%, #3a3d48 40%, #2a2d35 100%);
+  box-shadow:
+    0 0 0 1px #1a1c22,
+    0 0 0 3px #8e949e,
+    0 4px 0 #0d0e12,
+    0 8px 12px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.8);
+  transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.15s ease;
 }
 
-#selection-controls button:hover:not(:disabled) {
-  background: #2a2a38;
-  border-color: #888;
+.btn-chrome:hover:not(:disabled) {
+  background: linear-gradient(180deg, #6a6e78 0%, #4a4e58 45%, #3a3d48 100%);
 }
 
-#selection-controls button:disabled {
+.btn-chrome:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    0 0 0 1px #1a1c22,
+    0 0 0 3px #8e949e,
+    0 1px 0 #0d0e12,
+    0 3px 6px rgba(0, 0, 0, 0.45),
+    inset 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.btn-chrome:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 
-/* ===== Selected Sequence ===== */
+/* ===== Selected Sequence — metal plate ===== */
+
+.sequence-plate {
+  min-height: 52px;
+  padding: 0.6rem 0.5rem;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #3a3d44 0%, #2a2d32 100%);
+  box-shadow:
+    inset 0 3px 10px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.06);
+}
 
 #selected-sequence {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.45rem;
   justify-content: center;
   min-height: 44px;
   align-items: center;
@@ -225,23 +403,22 @@ section h2 {
 }
 
 .colour-chip {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  border: 2px solid rgba(255,255,255,0.25);
-}
-
-.empty-hint {
-  color: #666;
-  font-style: italic;
-  font-size: 0.9rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+  border: 3px solid #c0c4cc;
+  box-shadow:
+    0 2px 0 #1a1c20,
+    0 3px 5px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 /* ===== Reels ===== */
@@ -368,43 +545,106 @@ section h2 {
   pointer-events: none;
 }
 
-/* ===== Actions ===== */
+/* ===== SPIN — big mushroom / arcade plunger ===== */
 
 #action-area {
   display: flex;
   justify-content: center;
+  padding: 1rem 0 0.5rem;
 }
 
-#btn-spin {
-  padding: 0.75rem 3rem;
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.btn-spin-mushroom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  min-height: 64px;
+  padding: 0 1.5rem;
   border: none;
-  border-radius: 10px;
+  border-radius: 14px;
   cursor: pointer;
-  background: linear-gradient(135deg, #E53935, #8E24AA);
+  background: transparent;
+  transition: transform 0.08s ease, opacity 0.15s ease;
+}
+
+.btn-spin-mushroom__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #b8bcc6 0%, #6a6e78 35%, #4a4e58 70%, #8a8e98 100%);
+  box-shadow:
+    0 0 0 2px #2a2d35,
+    0 5px 0 #0a0a0c,
+    0 10px 20px rgba(0, 0, 0, 0.55),
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.btn-spin-mushroom__ring::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #c41e3a 0%, #8b1530 45%, #5c0a18 100%);
+  box-shadow:
+    inset 0 3px 8px rgba(255, 255, 255, 0.15),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.45);
+}
+
+.btn-spin-mushroom__label {
+  position: relative;
+  z-index: 1;
+  font-family: 'Archivo Black', 'Oswald', sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.28em;
   color: #fff;
-  transition: transform 0.12s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  text-transform: uppercase;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(255, 80, 80, 0.35);
 }
 
-#btn-spin:hover:not(:disabled) {
-  transform: scale(1.04);
-  box-shadow: 0 0 20px rgba(229, 57, 53, 0.4);
+.btn-spin-mushroom:hover:not(:disabled) .btn-spin-mushroom__ring::after {
+  filter: brightness(1.08);
 }
 
-#btn-spin:disabled {
-  opacity: 0.3;
+.btn-spin-mushroom:active:not(:disabled) {
+  transform: translateY(5px);
+}
+
+.btn-spin-mushroom:active:not(:disabled) .btn-spin-mushroom__ring {
+  box-shadow:
+    0 0 0 2px #2a2d35,
+    0 1px 0 #0a0a0c,
+    0 4px 10px rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.btn-spin-mushroom:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
+  filter: grayscale(0.35);
 }
 
-/* ===== Result ===== */
+.btn-spin-mushroom:disabled .btn-spin-mushroom__ring::after {
+  filter: brightness(0.55);
+}
+
+/* ===== Result — marquee strip ===== */
 
 #result-area {
   text-align: center;
-  padding: 0.75rem;
-  border-radius: 10px;
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #1a0a0c 0%, #0d0506 100%);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 2px solid #2a1a1c;
   transition: opacity 0.2s ease;
 }
 
@@ -413,13 +653,21 @@ section h2 {
 }
 
 .outcome-win {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #43A047;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7cfc8a;
+  text-shadow: 0 0 12px rgba(80, 220, 100, 0.45);
 }
 
 .outcome-loss {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #E53935;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ff6b6b;
+  text-shadow: 0 0 10px rgba(255, 80, 80, 0.35);
 }
