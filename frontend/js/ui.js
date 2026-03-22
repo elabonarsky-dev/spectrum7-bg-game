@@ -130,16 +130,29 @@ const UI = (() => {
         strip.style.transform  = 'translateY(0)';
         strip.innerHTML        = '';
 
-        // ── 2. Prefix: exactly SPIN_TILES tiles ──────────────────────────
-        // Derive cycle count from SPIN_TILES so this never goes out of sync.
-        // SPIN_TILES=28 → 4 cycles = 28 tiles.  SPIN_TILES=21 → 3 cycles = 21.
+        // ── 2. Prefix: SPIN_TILES tiles with no adjacent duplicate colours ──
+        //
+        // Rules enforced tile-by-tile:
+        //   • Each tile ≠ the tile immediately before it (no same-colour run).
+        //   • The LAST prefix tile also ≠ result[0], because that tile sits
+        //     directly above result[0] in reel 0's visible window at rest.
+        //     Without this, reel 0 would show the same colour in its top and
+        //     centre slots after the spin stops.
+        //
+        // With 7 colours available, excluding at most 2 always leaves ≥ 5
+        // choices, so this never deadlocks.
         const prefix = [];
-        const spinCycles = Math.ceil(SPIN_TILES / COLOURS.length);
-        for (let r = 0; r < spinCycles; r++) prefix.push(...COLOURS);
-        for (let k = prefix.length - 1; k > 0; k--) {
-          const j = Math.floor(Math.random() * (k + 1));
-          [prefix[k], prefix[j]] = [prefix[j], prefix[k]];
+        let prevPrefixColour = null;
+
+        for (let p = 0; p < SPIN_TILES; p++) {
+          const isLastTile = (p === SPIN_TILES - 1);
+          let available = COLOURS.filter(c => c !== prevPrefixColour);
+          if (isLastTile) available = available.filter(c => c !== result[0]);
+          const pick = available[Math.floor(Math.random() * available.length)];
+          prefix.push(pick);
+          prevPrefixColour = pick;
         }
+
         prefix.forEach(c => strip.appendChild(createReelTile(c)));
 
         // ── 3. Result tiles (all 7) ───────────────────────────────────────
