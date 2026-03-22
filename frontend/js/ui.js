@@ -29,15 +29,19 @@ const UI = (() => {
 
   /**
    * How many tile-heights of travel before the landing position.
-   * Larger = longer visible blur, stronger sense of downward travel.
+   * More tiles = longer path for the ~10 s spin so motion stays visible.
    */
-  const SPIN_EXTRA_TILES = 18;
+  const SPIN_EXTRA_TILES = 26;
 
-  /** Base spin duration (ms); last reel adds STAGGER_MS * 6. */
-  const SPIN_BASE_MS = 5200;
+  /**
+   * Spin duration: reel i uses SPIN_BASE_MS + i * STAGGER_MS.
+   * Tuned so the last reel (i=6) finishes at ~10 s:
+   *   7600 + 6 * 400 = 10000 ms.
+   */
+  const SPIN_BASE_MS = 7600;
 
-  /** Extra ms per reel index — reel 0 stops first, reel 6 last. */
-  const STAGGER_MS = 520;
+  /** Stagger: left reels lock first, right reel last. */
+  const STAGGER_MS = 400;
 
   /**
    * Main spin easing: slow build (weight), long heavy deceleration at the end.
@@ -145,7 +149,7 @@ const UI = (() => {
   function spinReels(result) {
     const totalReels = 7;
     const maxDuration =
-      SPIN_BASE_MS + (totalReels - 1) * STAGGER_MS + 900;
+      SPIN_BASE_MS + (totalReels - 1) * STAGGER_MS + 1200;
 
     return new Promise(resolve => {
       const tileH = getTileH();
