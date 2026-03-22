@@ -34,19 +34,20 @@ const UI = (() => {
   const SPIN_EXTRA_TILES = 26;
 
   /**
-   * Spin duration: reel i uses SPIN_BASE_MS + i * STAGGER_MS.
-   * Tuned so the last reel (i=6) finishes at ~10 s:
-   *   7600 + 6 * 400 = 10000 ms.
+   * Two-phase spin so “fast rotating” lasts longer than 7 s:
+   *   Phase 1 — linear motion over FAST_ROTATE_MS (constant blur, >7 s).
+   *   Phase 2 — heavy ease from a blend point to the final stop (staggered).
    */
-  const SPIN_BASE_MS = 7600;
+  const FAST_ROTATE_MS = 7500;
 
-  /** Stagger: left reels lock first, right reel last. */
+  /** Share of total translateY covered in phase 1 (rest decelerates in phase 2). */
+  const BLEND_FRACTION = 0.88;
+
+  /** Slow / lock phase: reel i runs SLOW_BASE_MS + i * STAGGER_MS. */
+  const SLOW_BASE_MS = 2200;
   const STAGGER_MS = 400;
 
-  /**
-   * Main spin easing: slow build (weight), long heavy deceleration at the end.
-   * Values approximate a physical drum losing energy.
-   */
+  /** Phase 2 only — drum losing energy, mechanical stop. */
   const SPIN_EASING = 'cubic-bezier(0.08, 0.82, 0.12, 1)';
 
   const $palette       = () => document.getElementById('colour-palette');
@@ -149,7 +150,7 @@ const UI = (() => {
   function spinReels(result) {
     const totalReels = 7;
     const maxDuration =
-      SPIN_BASE_MS + (totalReels - 1) * STAGGER_MS + 1200;
+      FAST_ROTATE_MS + SLOW_BASE_MS + (totalReels - 1) * STAGGER_MS + 1800;
 
     return new Promise(resolve => {
       const tileH = getTileH();
@@ -205,35 +206,55 @@ const UI = (() => {
         const centerIndex = PRE_SPIN_TILES + SPIN_TILES + i;
         const finalY = -((centerIndex - 1) * tileH);
         const startY = finalY - SPIN_EXTRA_TILES * tileH;
+        const blendY =
+          startY + (finalY - startY) * BLEND_FRACTION;
 
-        const duration = SPIN_BASE_MS + i * STAGGER_MS;
+        const phase2Ms = SLOW_BASE_MS + i * STAGGER_MS;
 
         strip.style.willChange = 'transform';
         strip.style.transform = `translateY(${startY}px)`;
 
+        function runPhase2() {
+          strip.style.transition = 'none';
+          strip.style.transform = `translateY(${blendY}px)`;
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              strip.style.transition =
+                `transform ${phase2Ms}ms ${SPIN_EASING}`;
+              strip.style.transform = `translateY(${finalY}px)`;
+
+              strip.addEventListener('transitionend', function onPhase2End(e) {
+                if (e.propertyName !== 'transform') return;
+                strip.removeEventListener('transitionend', onPhase2End);
+                strip.style.willChange = 'auto';
+
+                if (typeof ReelAudio !== 'undefined') {
+                  ReelAudio.playReelStop();
+                }
+                applyMechanicalSettle(strip, finalY, tileH);
+
+                stoppedCount++;
+                if (stoppedCount >= totalReels) {
+                  clearTimeout(fallback);
+                  resolve();
+                }
+              }, { once: true });
+            });
+          });
+        }
+
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             strip.style.transition =
-              `transform ${duration}ms ${SPIN_EASING}`;
-            strip.style.transform = `translateY(${finalY}px)`;
+              `transform ${FAST_ROTATE_MS}ms linear`;
+            strip.style.transform = `translateY(${blendY}px)`;
           });
         });
 
-        strip.addEventListener('transitionend', function onMainEnd(e) {
+        strip.addEventListener('transitionend', function onPhase1End(e) {
           if (e.propertyName !== 'transform') return;
-          strip.removeEventListener('transitionend', onMainEnd);
-          strip.style.willChange = 'auto';
-
-          if (typeof ReelAudio !== 'undefined') {
-            ReelAudio.playReelStop();
-          }
-          applyMechanicalSettle(strip, finalY, tileH);
-
-          stoppedCount++;
-          if (stoppedCount >= totalReels) {
-            clearTimeout(fallback);
-            resolve();
-          }
+          strip.removeEventListener('transitionend', onPhase1End);
+          runPhase2();
         }, { once: true });
       });
     });
