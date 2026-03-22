@@ -1,0 +1,324 @@
+/* ===== CSS Variables ===== */
+/*
+ * --tile-h drives every reel dimension so JS (getTileH()) and CSS always agree.
+ * Overridden at breakpoints in mobile.css.
+ */
+:root {
+  --tile-h: 72px;
+}
+
+/* ===== Base Reset & Typography ===== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #121218;
+  color: #e8e8e8;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* ===== Game Container ===== */
+
+#game-container {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ===== Header ===== */
+
+#game-header {
+  text-align: center;
+  padding: 1.25rem 0 0.5rem;
+}
+
+#game-header h1 {
+  font-size: 2.4rem;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+#game-header .accent {
+  background: linear-gradient(135deg, #E53935, #FB8C00, #FDD835, #43A047, #1E88E5, #3949AB, #8E24AA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  color: #999;
+}
+
+/* ===== Section Headings ===== */
+
+section h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+  margin-bottom: 0.75rem;
+}
+
+/* ===== Colour Palette ===== */
+
+#colour-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.colour-btn {
+  width: 80px;
+  height: 44px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s ease;
+}
+
+.colour-btn:hover:not(:disabled) {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(255,255,255,0.2);
+}
+
+.colour-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ===== Selection Controls ===== */
+
+#selection-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
+#selection-controls button {
+  padding: 0.45rem 1.1rem;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: #1e1e28;
+  color: #ccc;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+#selection-controls button:hover:not(:disabled) {
+  background: #2a2a38;
+  border-color: #888;
+}
+
+#selection-controls button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ===== Selected Sequence ===== */
+
+#selected-sequence {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+  min-height: 44px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.colour-chip {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.25);
+}
+
+.empty-hint {
+  color: #666;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* ===== Reels ===== */
+
+/*
+ * #reels-container is the flex row holding all 7 reel windows.
+ * position: relative enables the ::before / ::after win-line pseudo-elements.
+ *
+ * ::before = top edge of the centre (win) tile
+ * ::after  = bottom edge of the centre (win) tile
+ * Together they frame the win line without requiring extra HTML.
+ */
+#reels-container {
+  position: relative;
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+/* Top win-line border */
+#reels-container::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: var(--tile-h);
+  height: 2px;
+  background: rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Bottom win-line border */
+#reels-container::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(var(--tile-h) * 2);
+  height: 2px;
+  background: rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Individual reel window */
+.reel-window {
+  width: var(--tile-h);
+  height: calc(var(--tile-h) * 3);
+  border: 2px solid #3a3a4a;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  background: #0a0a12;
+  flex-shrink: 0;
+}
+
+/* Top fade — fades out tiles scrolling in from above */
+.reel-window::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 28px;
+  background: linear-gradient(to bottom, rgba(10,10,18,0.88), transparent);
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Bottom fade — fades out tiles scrolling out below */
+.reel-window::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 28px;
+  background: linear-gradient(to top, rgba(10,10,18,0.88), transparent);
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Scrolling strip — animated via transform: translateY() in JS */
+.reel-strip {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+}
+
+/* Each colour tile in the strip */
+.reel-tile {
+  width: 100%;
+  height: var(--tile-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  user-select: none;
+}
+
+/* Colour name label inside each tile */
+.reel-label {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+/* ===== Actions ===== */
+
+#action-area {
+  display: flex;
+  justify-content: center;
+}
+
+#btn-spin {
+  padding: 0.75rem 3rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #E53935, #8E24AA);
+  color: #fff;
+  transition: transform 0.12s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+#btn-spin:hover:not(:disabled) {
+  transform: scale(1.04);
+  box-shadow: 0 0 20px rgba(229, 57, 53, 0.4);
+}
+
+#btn-spin:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ===== Result ===== */
+
+#result-area {
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 10px;
+  transition: opacity 0.2s ease;
+}
+
+#result-area.hidden {
+  display: none;
+}
+
+.outcome-win {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #43A047;
+}
+
+.outcome-loss {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #E53935;
+}

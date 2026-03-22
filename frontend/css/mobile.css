@@ -1,0 +1,86 @@
+/* ===== Mobile & Small Screen Overrides ===== */
+/*
+ * --tile-h controls all reel dimensions (width, height, win-line position).
+ * Reducing it here automatically scales every dependent measurement.
+ * The JS getTileH() function reads this variable at spin time so the
+ * animation calculations always match the CSS layout.
+ */
+
+@media (max-width: 600px) {
+  :root {
+    --tile-h: 52px;
+  }
+
+  #game-header h1 {
+    font-size: 1.9rem;
+  }
+
+  .colour-btn {
+    width: 68px;
+    height: 40px;
+    font-size: 0.68rem;
+  }
+
+  .colour-chip {
+    width: 34px;
+    height: 34px;
+    font-size: 0.8rem;
+  }
+
+  #btn-spin {
+    padding: 0.65rem 2.2rem;
+    font-size: 1rem;
+  }
+
+  .outcome-win,
+  .outcome-loss {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 430px) {
+  :root {
+    --tile-h: 42px;
+  }
+
+  #game-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .colour-btn {
+    width: 58px;
+    height: 36px;
+    font-size: 0.62rem;
+  }
+
+  #colour-palette {
+    gap: 0.35rem;
+  }
+
+  #reels-container {
+    gap: 0.25rem;
+  }
+
+  /* Labels are still visible but tighter */
+  .reel-label {
+    font-size: 0.45rem;
+    letter-spacing: 0.03em;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --tile-h: 36px;
+  }
+
+  /* Hide text labels at very small tile sizes — colour alone identifies each reel */
+  .reel-label {
+    display: none;
+  }
+
+  .colour-btn {
+    width: 50px;
+    height: 32px;
+    font-size: 0.58rem;
+  }
+}

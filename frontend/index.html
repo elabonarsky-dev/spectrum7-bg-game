@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spectrum 7</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/mobile.css" />
+</head>
+<body>
+  <div id="game-container">
+
+    <header id="game-header">
+      <h1>Spectrum <span class="accent">7</span></h1>
+      <p class="subtitle">Pick your colours. Match the reels.</p>
+    </header>
+
+    <section id="selection-area">
+      <h2>Choose Your Colours</h2>
+      <div id="colour-palette"></div>
+      <div id="selection-controls">
+        <button id="btn-undo" disabled>Undo Last</button>
+        <button id="btn-reset" disabled>Reset</button>
+      </div>
+    </section>
+
+    <section id="sequence-area">
+      <h2>Your Sequence</h2>
+      <div id="selected-sequence"></div>
+    </section>
+
+    <section id="reels-area">
+      <h2>Reels</h2>
+      <!-- Reel windows are built dynamically by UI.buildReels() -->
+      <!-- Win line is rendered via #reels-container::before / ::after in CSS -->
+      <div id="reels-container"></div>
+    </section>
+
+    <section id="action-area">
+      <button id="btn-spin" disabled>Spin</button>
+    </section>
+
+    <section id="result-area" class="hidden">
+      <div id="result-message"></div>
+    </section>
+
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/reels.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/selection.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

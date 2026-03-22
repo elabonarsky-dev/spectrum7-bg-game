@@ -1,0 +1,11 @@
+[build]
+  publish = "frontend"
+  functions = "netlify/functions"
+
+# Rewrite /api/* to Netlify Functions so the URL pattern stays stable for Milestone 2.
+# e.g. GET /api/health   → /.netlify/functions/health
+#      POST /api/spin     → /.netlify/functions/spin  (Milestone 2)
+[[redirects]]
+  from = "/api/*"
+  to   = "/.netlify/functions/:splat"
+  status = 200
