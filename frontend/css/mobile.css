@@ -1,18 +1,58 @@
-/* ===== Mobile & Small Screen Overrides ===== */
+/* ===== Mobile & Small Screen Overrides =====
+ *
+ * --tile-h is NO LONGER set here.
+ * It is driven by clamp() in styles.css:
+ *   clamp(28px, calc((100vw - 138px) / 7), 88px)
+ * This automatically shrinks tiles to fit any viewport.
+ *
+ * These overrides handle everything else: padding, font sizes, buttons.
+ */
 
-@media (max-width: 600px) {
-  :root {
-    --tile-h: 64px;
+/* ── 700 px: tighten bezel padding so tiles stay as large as possible ──── */
+@media (max-width: 700px) {
+  .machine-bezel {
+    padding: 0.35rem;
+  }
+
+  .machine-bezel__window {
+    margin: 0.25rem 0.3rem 0.25rem;
+    padding: 0.5rem 0.35rem 0.6rem;
+  }
+
+  .machine-bezel__chrome {
+    padding: 0.55rem 0.5rem 0.65rem;
+  }
+
+  .machine-bezel__brand {
+    font-size: 1.25rem;
+    letter-spacing: 0.18em;
+  }
+}
+
+/* ── 540 px: tighter still ─────────────────────────────────────────────── */
+@media (max-width: 540px) {
+  body {
+    padding: 0.5rem 0.5rem 1.5rem;
+  }
+
+  .machine-bezel {
+    padding: 0.2rem;
+    border-width: 2px;
+  }
+
+  .machine-bezel__window {
+    margin: 0.2rem;
+    padding: 0.35rem 0.2rem 0.45rem;
+    border-width: 1px;
   }
 
   .machine-bezel__brand {
     font-size: 1.1rem;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
   }
 
-  .machine-bezel__window {
-    margin: 0.25rem 0.2rem 0.45rem;
-    padding: 0.45rem 0.35rem 0.55rem;
+  .machine-bezel__tag {
+    font-size: 0.65rem;
   }
 
   .cabinet-front {
@@ -57,9 +97,29 @@
   }
 }
 
-@media (max-width: 430px) {
-  :root {
-    --tile-h: 52px;
+/* ── 400 px: minimal bezel, smaller UI elements ─────────────────────────── */
+@media (max-width: 400px) {
+  body {
+    padding: 0.35rem 0.35rem 1.25rem;
+  }
+
+  .machine-bezel {
+    padding: 0.15rem;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .machine-bezel__window {
+    margin: 0.15rem;
+    padding: 0.25rem 0.15rem 0.3rem;
+  }
+
+  .machine-bezel__brand {
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+  }
+
+  #reels-container {
+    gap: 4px;
   }
 
   #game-header h1 {
@@ -67,7 +127,7 @@
   }
 
   .colour-btn {
-    width: 62px;
+    width: 60px;
     height: 38px;
     font-size: 0.58rem;
   }
@@ -76,13 +136,9 @@
     gap: 0.4rem;
   }
 
-  #reels-container {
-    gap: 0.25rem;
-  }
-
   .reel-label {
-    font-size: 0.45rem;
-    letter-spacing: 0.03em;
+    font-size: 0.48rem;
+    letter-spacing: 0.02em;
   }
 
   .panel-label {
@@ -91,24 +147,25 @@
   }
 }
 
+/* ── 360 px: hide reel labels (tiles too small to read text) ─────────────── */
 @media (max-width: 360px) {
-  :root {
-    --tile-h: 44px;
-  }
-
   .reel-label {
     display: none;
   }
 
+  .machine-bezel__chrome {
+    padding: 0.4rem 0.3rem 0.5rem;
+  }
+
   .colour-btn {
-    width: 54px;
+    width: 52px;
     height: 34px;
     font-size: 0.52rem;
   }
 
   .btn-spin-mushroom {
-    min-width: 170px;
-    min-height: 52px;
+    min-width: 160px;
+    min-height: 50px;
   }
 
   .btn-spin-mushroom__label {

@@ -4,7 +4,7 @@
  * Overridden at breakpoints in mobile.css.
  */
 :root {
-  --tile-h: 88px;
+  --tile-h: clamp(28px, calc((100vw - 138px) / 7), 88px);
   --chrome-dark: #1a1c22;
   --chrome-mid: #3a3d48;
   --chrome-light: #6d7280;
@@ -133,6 +133,7 @@ body {
   margin: 0.4rem 0.45rem 0.35rem;
   padding: 0.75rem 0.55rem 0.9rem;
   border-radius: 8px;
+  overflow: hidden;
   background:
     linear-gradient(180deg, #050608 0%, #141820 50%, #0a0c10 100%);
   box-shadow:
@@ -434,9 +435,12 @@ body {
 #reels-container {
   position: relative;
   display: flex;
-  gap: 0.45rem;
+  gap: 6px;
   justify-content: center;
+  align-items: flex-start;
+  width: 100%;
   min-height: calc(var(--tile-h) * 3);
+  overflow: hidden;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 }
 
@@ -482,7 +486,7 @@ body {
   border-radius: 6px;
   overflow: hidden;
   position: relative;
-  flex-shrink: 0;
+  flex: 0 0 var(--tile-h);
   /* Curved barrel shading (left/right darker like a real drum) */
   background:
     linear-gradient(90deg,
