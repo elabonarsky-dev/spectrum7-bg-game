@@ -1,10 +1,10 @@
-/* ===== CSS Variables ===== */
+﻿/* ===== CSS Variables ===== */
 /*
  * --tile-h drives every reel dimension so JS (getTileH()) and CSS always agree.
  * Overridden at breakpoints in mobile.css.
  */
 :root {
-  --tile-h: 72px;
+  --tile-h: 88px;
   --chrome-dark: #1a1c22;
   --chrome-mid: #3a3d48;
   --chrome-light: #6d7280;
@@ -475,7 +475,7 @@ body {
   z-index: 10;
 }
 
-/* Individual reel window — chrome frame */
+/* Individual reel window — chrome + cylindrical drum read */
 .reel-window {
   width: var(--tile-h);
   height: calc(var(--tile-h) * 3);
@@ -483,13 +483,23 @@ body {
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
-  background: linear-gradient(180deg, #15171a 0%, #0a0a0e 100%);
+  /* Curved barrel shading (left/right darker like a real drum) */
+  background:
+    linear-gradient(90deg,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.08) 22%,
+      rgba(255, 255, 255, 0.04) 50%,
+      rgba(0, 0, 0, 0.1) 78%,
+      rgba(0, 0, 0, 0.48) 100%),
+    linear-gradient(180deg, #161820 0%, #08090c 100%);
   border: 2px solid #2a2d35;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -2px 6px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.55),
     0 2px 4px rgba(0, 0, 0, 0.6),
     0 0 0 1px rgba(255, 255, 255, 0.04);
+  perspective: 720px;
+  perspective-origin: 50% 45%;
 }
 
 /* Top fade — fades out tiles scrolling in from above */
@@ -514,24 +524,48 @@ body {
   z-index: 4;
 }
 
-/* Scrolling strip — animated via transform: translateY() in JS */
+/* Scrolling strip - translate3d driven by JS. Filter is an instant class toggle
+   (no CSS transition) so transitionend fires only for transform, keeping the
+   fast to medium to slow phase chain intact. */
 .reel-strip {
   position: absolute;
   top: 0; left: 0; right: 0;
+  backface-visibility: hidden;
 }
 
-/* Each colour tile in the strip */
+/* Idle: fully sharp */
+.reel-strip--idle {
+  filter: none;
+}
+
+/* Fast: heavy vertical smear - drum at full speed */
+.reel-strip--phase-fast {
+  filter: blur(3.5px) brightness(1.08) saturate(1.15);
+}
+
+/* Medium: blur easing off as drum coasts */
+.reel-strip--phase-medium {
+  filter: blur(1.4px) brightness(1.03);
+}
+
+/* Slow: nearly sharp - final creep before mechanical clunk */
+.reel-strip--phase-slow {
+  filter: blur(0.3px);
+}
+
 .reel-tile {
   width: 100%;
   height: var(--tile-h);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
   user-select: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    inset 2px 0 4px rgba(0, 0, 0, 0.15),
+    inset -2px 0 4px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
 /* Colour name label inside each tile */

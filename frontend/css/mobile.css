@@ -2,7 +2,7 @@
 
 @media (max-width: 600px) {
   :root {
-    --tile-h: 52px;
+    --tile-h: 64px;
   }
 
   .machine-bezel__brand {
@@ -59,7 +59,7 @@
 
 @media (max-width: 430px) {
   :root {
-    --tile-h: 42px;
+    --tile-h: 52px;
   }
 
   #game-header h1 {
@@ -93,7 +93,7 @@
 
 @media (max-width: 360px) {
   :root {
-    --tile-h: 36px;
+    --tile-h: 44px;
   }
 
   .reel-label {
